@@ -1,4 +1,4 @@
-import type { Prisma } from "@/app/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { HallImage } from "@/components/hall-image";
 import { HallFilters } from "@/components/hall-filters";
