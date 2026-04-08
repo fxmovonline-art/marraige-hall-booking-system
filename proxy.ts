@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 type UserRole = "CUSTOMER" | "OWNER" | "ADMIN";
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const { nextUrl } = req;
   const token = await getToken({
     req,
@@ -14,7 +14,6 @@ export default async function middleware(req: NextRequest) {
   if (!token) {
     const signInUrl = new URL("/api/auth/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", nextUrl.pathname + nextUrl.search);
-
     return NextResponse.redirect(signInUrl);
   }
 
