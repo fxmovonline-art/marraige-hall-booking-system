@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         Role          @default(CUSTOMER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  bookings     Booking[]     @relation("CustomerBookings")
+  bookingLocks BookingLock[] @relation("CustomerBookingLocks")
+  complaints   Complaint[]   @relation("CustomerComplaints")
+  ownedHalls   Hall[]        @relation("HallOwner")
+  ownerProfile OwnerProfile?
+  transactions Transaction[] @relation("CustomerTransactions")
+}
+
+model Hall {
+  id           String        @id
+  ownerId      String
+  name         String
+  description  String?
+  address      String
+  city         String
+  capacity     Int
+  pricePerDay  Decimal       @db.Decimal(10, 2)
+  status       HallStatus    @default(PENDING)
+  isVerified   Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  area         String?
+  hasAC        Boolean       @default(false)
+  hasCatering  Boolean       @default(false)
+  hasParking   Boolean       @default(false)
+  pricePerHead Decimal?      @db.Decimal(10, 2)
+  imageUrls    String[]
+  slug         String?       @unique
+  bookings     Booking[]
+  locks        BookingLock[]
+  owner        User          @relation("HallOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([city])
+  @@index([area])
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  customerId   String
+  hallId       String
+  eventDate    DateTime
+  startTime    DateTime
+  endTime      DateTime
+  guestCount   Int
+  totalPrice   Decimal       @db.Decimal(10, 2)
+  specialNotes String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  addOns       Json?
+  contactEmail String?
+  contactName  String?
+  contactPhone String?
+  packageName  String?
+  slot         BookingSlot
+  status       BookingStatus @default(PENDING_CONFIRMATION)
+  customer     User          @relation("CustomerBookings", fields: [customerId], references: [id])
+  hall         Hall          @relation(fields: [hallId], references: [id])
+  transactions Transaction[]
+
+  @@index([customerId])
+  @@index([hallId])
+  @@index([eventDate])
+  @@index([hallId, eventDate, slot])
+  @@index([status])
+}
+
+model Transaction {
+  id               String            @id @default(cuid())
+  bookingId        String
+  customerId       String
+  amount           Decimal           @db.Decimal(10, 2)
+  status           TransactionStatus @default(PENDING)
+  transactionType  TransactionType
+  paymentMethod    String
+  paymentReference String?
+  paidAt           DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  booking          Booking           @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customer         User              @relation("CustomerTransactions", fields: [customerId], references: [id])
+
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([status])
+}
+
+model BookingLock {
+  id         String      @id @default(cuid())
+  customerId String
+  hallId     String
+  eventDate  DateTime
+  slot       BookingSlot
+  expiresAt  DateTime
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  customer   User        @relation("CustomerBookingLocks", fields: [customerId], references: [id], onDelete: Cascade)
+  hall       Hall        @relation(fields: [hallId], references: [id], onDelete: Cascade)
+
+  @@unique([hallId, eventDate, slot])
+  @@index([customerId])
+  @@index([expiresAt])
+}
+
+model OwnerProfile {
+  id                 String                 @id @default(cuid())
+  userId             String                 @unique
+  businessName       String
+  businessType       String
+  registrationNumber String?
+  taxId              String?
+  contactPhone       String
+  address            String
+  city               String
+  description        String?
+  status             VerificationStatus     @default(PENDING)
+  isVerified         Boolean                @default(false)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents          VerificationDocument[]
+
+  @@index([status])
+}
+
+model VerificationDocument {
+  id             String       @id @default(cuid())
+  ownerProfileId String
+  documentType   DocumentType
+  fileName       String
+  fileUrl        String
+  mimeType       String
+  size           Int
+  uploadedAt     DateTime     @default(now())
+  ownerProfile   OwnerProfile @relation(fields: [ownerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([ownerProfileId])
+  @@index([documentType])
+}
+
+model Complaint {
+  id         String   @id @default(cuid())
+  customerId String
+  subject    String
+  message    String
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  customer   User     @relation("CustomerComplaints", fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([status])
+}
+
+enum Role {
+  CUSTOMER
+  OWNER
+  ADMIN
+}
+
+enum HallStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DocumentType {
+  BUSINESS_LICENSE
+  GOVERNMENT_ID
+  ADDRESS_PROOF
+  OTHER
+}
+
+enum BookingStatus {
+  PENDING_CONFIRMATION
+  CONFIRMED
+  CANCELLED
+  REJECTED
+  ADVANCE_PAID
+}
+
+enum BookingSlot {
+  LUNCH
+  DINNER
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum TransactionType {
+  INITIAL_INSTALLMENT
+  BALANCE_PAYMENT
+  FULL_PAYMENT
+}

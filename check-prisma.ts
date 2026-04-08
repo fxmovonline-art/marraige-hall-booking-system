@@ -1,0 +1,27 @@
+import { PrismaClient } from "./app/generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not set.");
+}
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+
+async function main() {
+  try {
+    const list = await prisma.hall.findMany({
+      where: { AND: [] },
+      orderBy: [{ createdAt: "desc" }],
+      include: { owner: { select: { name: true } } }
+    });
+    console.log("Halls returning:", list.length);
+    console.log(list);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+main().finally(() => prisma.$disconnect());

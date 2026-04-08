@@ -24,3 +24,134 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom animations and utilities */
+@layer utilities {
+  .bg-gradient-radial {
+    background-image: radial-gradient(var(--tw-gradient-stops));
+  }
+
+  .bg-gradient-conic {
+    background-image: conic-gradient(var(--tw-gradient-stops));
+  }
+
+  .animate-slow-spin {
+    animation: spin 8s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .filter-brightness-gold {
+    filter: brightness(1.2) contrast(1.1);
+  }
+
+  /* Blur only the content below the hero when header toggles */
+  body.content-blur #blur-area {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    filter: blur(6px) saturate(0.95);
+  }
+}
+
+
+/* DayPicker Theme: High-contrast premium light theme for v9 */
+.rdp-root {
+  --rdp-accent-color: #18181b; /* Zinc 950 */
+  --rdp-accent-background-color: #f4f4f5; /* Zinc 100 */
+  --rdp-day-width: 42px;
+  --rdp-day-height: 42px;
+  --rdp-font-family: inherit;
+  margin: 0;
+}
+
+/* Ensure root text is dark */
+.rdp-root,
+.rdp-caption_label,
+.rdp-weekday,
+.rdp-day_button {
+  color: #18181b !important;
+}
+
+.rdp-caption_label {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.rdp-nav_button {
+  color: #18181b !important;
+  border-radius: 9999px !important;
+  transition: background-color 0.2s;
+}
+
+.rdp-nav_button:hover {
+  background-color: #f4f4f5 !important;
+}
+
+.rdp-weekday {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #71717a !important; /* Zinc 500 */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.75rem;
+}
+
+.rdp-day {
+  padding: 2px;
+}
+
+.rdp-day_button {
+  border-radius: 10px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  border: 1px solid transparent !important;
+}
+
+.rdp-day_button:hover:not(:disabled):not(.rdp-selected) {
+  background-color: #f4f4f5 !important;
+  transform: scale(1.05);
+  border-color: #e4e4e7 !important;
+}
+
+/* Selected state: Stronger contrast */
+.rdp-selected .rdp-day_button {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Disabled state */
+.rdp-disabled {
+  opacity: 0.25 !important;
+  cursor: not-allowed;
+}
+
+.rdp-disabled .rdp-day_button {
+  background: transparent !important;
+}
+
+/* Today hint */
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: #2563eb !important; /* Blue for today */
+  font-weight: 800;
+  border-color: #dbeafe !important;
+  background-color: #eff6ff !important;
+}
+
+/* Custom modifier from owner-dashboard-panel.tsx: "confirmed" */
+.rdp-day.confirmed .rdp-day_button {
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+  border-color: #a7f3d0 !important;
+  font-weight: 600;
+}
+

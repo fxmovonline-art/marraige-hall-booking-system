@@ -1,4 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), using TypeScript, Tailwind CSS, and Prisma ORM.
+
+## Database (PostgreSQL + Prisma)
+
+The Prisma schema is defined in `prisma/schema.prisma` and includes the core MHBS entities:
+
+- `User` with role enum: `CUSTOMER`, `OWNER`, `ADMIN`
+- `Hall` with approval enum: `PENDING`, `APPROVED`, `REJECTED`
+- `Booking` with relational links to both `User` (customer) and `Hall`
+
+1. Configure your PostgreSQL connection in `.env`:
+
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/mhbs?schema=public"
+```
+
+2. Create and apply migrations:
+
+```bash
+npm run prisma:migrate -- --name init_mhbs
+```
+
+3. Generate Prisma client (already run once after schema changes):
+
+```bash
+npm run prisma:generate
+```
+
+4. Optional: inspect DB with Prisma Studio:
+
+```bash
+npm run prisma:studio
+```
 
 ## Getting Started
 
