@@ -101,22 +101,24 @@ export default async function AdminDashboardPage() {
 
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f5f1e8_40%,#ffffff_100%)] px-6 py-12 md:px-10">
-      <div className="mx-auto max-w-7xl flex gap-8">
-        <DashboardSidebar name={session.user.name ?? "Admin"} email={session.user.email ?? ""} role={session.user.role ?? "ADMIN"} />
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f5f1e8_40%,#ffffff_100%)] px-4 py-8 md:px-10 md:py-12">
+      <div className="mx-auto max-w-7xl flex gap-6 md:gap-8 flex-col md:flex-row">
+        <div className="hidden md:block">
+          <DashboardSidebar name={session.user.name ?? "Admin"} email={session.user.email ?? ""} role={session.user.role ?? "ADMIN"} />
+        </div>
 
-        <div className="flex-1">
-          <div className="mb-10 grid gap-6 rounded-[2rem] border border-black/10 bg-white/85 p-8 shadow-sm backdrop-blur md:grid-cols-[1.2fr_0.8fr]">
+        <div className="flex-1 min-w-0">
+          <div className="mb-8 md:mb-10 grid gap-4 md:gap-6 rounded-2xl md:rounded-[2rem] border border-black/10 bg-white/85 p-4 md:p-8 shadow-sm backdrop-blur md:grid-cols-[1.2fr_0.8fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-rose-700">Admin control center</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-zinc-950">Pending moderation queue</h1>
-            <p className="mt-4 max-w-2xl text-base leading-8 text-zinc-600">
+            <h1 className="mt-2 md:mt-3 text-2xl md:text-4xl font-semibold tracking-tight text-zinc-950">Pending moderation queue</h1>
+            <p className="mt-3 md:mt-4 max-w-2xl text-sm md:text-base leading-7 md:leading-8 text-zinc-600">
               Review owner applications and hall listings in one place. Approval marks records as verified, while rejection keeps verification disabled.
             </p>
           </div>
-          <div className="rounded-[1.75rem] bg-zinc-950 p-6 text-white">
-            <div className="text-sm uppercase tracking-[0.24em] text-white/60">Queue summary</div>
-            <div className="mt-4 space-y-3 text-sm text-white/80">
+          <div className="rounded-xl md:rounded-[1.75rem] bg-zinc-950 p-4 md:p-6 text-white">
+            <div className="text-xs md:text-sm uppercase tracking-[0.24em] text-white/60">Queue summary</div>
+            <div className="mt-3 md:mt-4 space-y-2 md:space-y-3 text-xs md:text-sm text-white/80">
               <div>{hallRows.length} hall listings awaiting decision</div>
               <div>{ownerApplicationRows.length} owner applications awaiting decision</div>
             </div>

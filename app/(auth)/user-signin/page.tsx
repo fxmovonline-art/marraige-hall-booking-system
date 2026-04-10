@@ -41,11 +41,11 @@ export default function UserSignIn() {
   };
 
   return (
-    <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#071a11] to-[#04110a]">
+    <div className="min-h-screen w-screen flex flex-col bg-gradient-to-b from-[#071a11] to-[#04110a]">
       <OrganicShapeMask className="absolute inset-0 -z-10 opacity-30" />
 
-      <div className="z-10 w-full px-4 sm:px-6">
-        <div className="max-w-md mx-auto rounded-2xl bg-zinc-900/85 p-6 sm:p-8 shadow-xl backdrop-blur-md">
+      <div className="z-10 w-full px-4 sm:px-6 pt-8 sm:pt-12 flex-1 flex flex-col items-center">
+        <div className="w-full max-w-md rounded-2xl bg-zinc-900/85 p-6 sm:p-8 shadow-xl backdrop-blur-md">
           <h2 className="text-2xl sm:text-3xl font-semibold text-white text-center mb-6 sm:mb-8">Sign in to your account</h2>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
