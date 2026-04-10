@@ -1,12 +1,10 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
-
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { Readable } from "stream";
 
 import { authOptions } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { cloudinary } from "@/lib/cloudinary";
 
 type SupportedUpload = {
   formKey: string;
@@ -23,150 +21,179 @@ function sanitizeFileName(fileName: string) {
   return fileName.replace(/[^a-zA-Z0-9.-]/g, "-").toLowerCase();
 }
 
-export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (session.user.role !== "OWNER") {
-    return NextResponse.json({ error: "Only owners can complete onboarding." }, { status: 403 });
-  }
-
-  const formData = await request.formData();
-
-  const businessName = String(formData.get("businessName") ?? "").trim();
-  const businessType = String(formData.get("businessType") ?? "").trim();
-  const registrationNumber = String(formData.get("registrationNumber") ?? "").trim();
-  const taxId = String(formData.get("taxId") ?? "").trim();
-  const contactPhone = String(formData.get("contactPhone") ?? "").trim();
-  const address = String(formData.get("address") ?? "").trim();
-  const city = String(formData.get("city") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-
-  if (!businessName || !businessType || !contactPhone || !address || !city) {
-    return NextResponse.json(
-      { error: "Business name, type, phone, address, and city are required." },
-      { status: 400 },
+async function uploadToCloudinary(
+  buffer: Buffer,
+  fileName: string,
+  folder: string,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: "auto" },
+      (error, result) => {
+        if (error) {
+          reject(new Error(`Cloudinary upload failed: ${error.message}`));
+        } else if (result) {
+          resolve(result.secure_url);
+        } else {
+          reject(new Error("Cloudinary upload failed: No result returned"));
+        }
+      },
     );
-  }
 
-  const existingProfile = await prisma.ownerProfile.findUnique({
-    where: { userId: session.user.id },
-    include: { documents: true },
+    const readable = Readable.from(buffer);
+    readable.pipe(uploadStream);
   });
+}
 
-  const hasExistingBusinessLicense = existingProfile?.documents.some(
-    (document) => document.documentType === "BUSINESS_LICENSE",
-  );
-  const hasExistingGovernmentId = existingProfile?.documents.some(
-    (document) => document.documentType === "GOVERNMENT_ID",
-  );
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
 
-  const uploadDirectory = path.join(
-    process.cwd(),
-    "public",
-    "uploads",
-    "owner-documents",
-    session.user.id,
-  );
-
-  await mkdir(uploadDirectory, { recursive: true });
-
-  const documentsToCreate: Array<{
-    documentType: "BUSINESS_LICENSE" | "GOVERNMENT_ID" | "ADDRESS_PROOF";
-    fileName: string;
-    fileUrl: string;
-    mimeType: string;
-    size: number;
-  }> = [];
-
-  for (const definition of uploadDefinitions) {
-    const file = formData.get(definition.formKey);
-
-    if (!(file instanceof File) || file.size === 0) {
-      continue;
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const safeFileName = sanitizeFileName(file.name || `${definition.formKey}.bin`);
-    const storedFileName = `${Date.now()}-${randomUUID()}-${safeFileName}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filePath = path.join(uploadDirectory, storedFileName);
-    const fileUrl = `/uploads/owner-documents/${session.user.id}/${storedFileName}`;
+    if (session.user.role !== "OWNER") {
+      return NextResponse.json({ error: "Only owners can complete onboarding." }, { status: 403 });
+    }
 
-    await writeFile(filePath, buffer);
+    const formData = await request.formData();
 
-    documentsToCreate.push({
-      documentType: definition.documentType,
-      fileName: file.name || storedFileName,
-      fileUrl,
-      mimeType: file.type || "application/octet-stream",
-      size: file.size,
+    const businessName = String(formData.get("businessName") ?? "").trim();
+    const businessType = String(formData.get("businessType") ?? "").trim();
+    const registrationNumber = String(formData.get("registrationNumber") ?? "").trim();
+    const taxId = String(formData.get("taxId") ?? "").trim();
+    const contactPhone = String(formData.get("contactPhone") ?? "").trim();
+    const address = String(formData.get("address") ?? "").trim();
+    const city = String(formData.get("city") ?? "").trim();
+    const description = String(formData.get("description") ?? "").trim();
+
+    if (!businessName || !businessType || !contactPhone || !address || !city) {
+      return NextResponse.json(
+        { error: "Business name, type, phone, address, and city are required." },
+        { status: 400 },
+      );
+    }
+
+    const existingProfile = await prisma.ownerProfile.findUnique({
+      where: { userId: session.user.id },
+      include: { documents: true },
     });
-  }
 
-  const uploadedBusinessLicense = documentsToCreate.some(
-    (document) => document.documentType === "BUSINESS_LICENSE",
-  );
-  const uploadedGovernmentId = documentsToCreate.some(
-    (document) => document.documentType === "GOVERNMENT_ID",
-  );
-
-  if (!hasExistingBusinessLicense && !uploadedBusinessLicense) {
-    return NextResponse.json(
-      { error: "Business license document is required." },
-      { status: 400 },
+    const hasExistingBusinessLicense = existingProfile?.documents.some(
+      (document) => document.documentType === "BUSINESS_LICENSE",
     );
-  }
-
-  if (!hasExistingGovernmentId && !uploadedGovernmentId) {
-    return NextResponse.json(
-      { error: "Government ID document is required." },
-      { status: 400 },
+    const hasExistingGovernmentId = existingProfile?.documents.some(
+      (document) => document.documentType === "GOVERNMENT_ID",
     );
-  }
 
-  const ownerProfile = await prisma.ownerProfile.upsert({
-    where: { userId: session.user.id },
-    create: {
-      userId: session.user.id,
-      businessName,
-      businessType,
-      registrationNumber: registrationNumber || null,
-      taxId: taxId || null,
-      contactPhone,
-      address,
-      city,
-      description: description || null,
-      status: "PENDING",
-      isVerified: false,
-      documents: documentsToCreate.length > 0 ? { create: documentsToCreate } : undefined,
-    },
-    update: {
-      businessName,
-      businessType,
-      registrationNumber: registrationNumber || null,
-      taxId: taxId || null,
-      contactPhone,
-      address,
-      city,
-      description: description || null,
-      status: "PENDING",
-      isVerified: false,
-      documents: documentsToCreate.length > 0 ? { create: documentsToCreate } : undefined,
-    },
-    include: {
-      documents: {
-        orderBy: {
-          uploadedAt: "desc",
+    const documentsToCreate: Array<{
+      documentType: "BUSINESS_LICENSE" | "GOVERNMENT_ID" | "ADDRESS_PROOF";
+      fileName: string;
+      fileUrl: string;
+      mimeType: string;
+      size: number;
+    }> = [];
+
+    // Upload documents to Cloudinary
+    for (const definition of uploadDefinitions) {
+      const file = formData.get(definition.formKey);
+
+      if (!(file instanceof File) || file.size === 0) {
+        continue;
+      }
+
+      try {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const safeFileName = sanitizeFileName(file.name || `${definition.formKey}.bin`);
+        const cloudinaryUrl = await uploadToCloudinary(
+          buffer,
+          safeFileName,
+          `owner-documents/${session.user.id}`,
+        );
+
+        documentsToCreate.push({
+          documentType: definition.documentType,
+          fileName: file.name || safeFileName,
+          fileUrl: cloudinaryUrl,
+          mimeType: file.type || "application/octet-stream",
+          size: file.size,
+        });
+      } catch (uploadError: any) {
+        return NextResponse.json(
+          { error: `Document upload failed: ${uploadError.message}` },
+          { status: 500 },
+        );
+      }
+    }
+
+    const uploadedBusinessLicense = documentsToCreate.some(
+      (document) => document.documentType === "BUSINESS_LICENSE",
+    );
+    const uploadedGovernmentId = documentsToCreate.some(
+      (document) => document.documentType === "GOVERNMENT_ID",
+    );
+
+    if (!hasExistingBusinessLicense && !uploadedBusinessLicense) {
+      return NextResponse.json(
+        { error: "Business license document is required." },
+        { status: 400 },
+      );
+    }
+
+    if (!hasExistingGovernmentId && !uploadedGovernmentId) {
+      return NextResponse.json(
+        { error: "Government ID document is required." },
+        { status: 400 },
+      );
+    }
+
+    const ownerProfile = await prisma.ownerProfile.upsert({
+      where: { userId: session.user.id },
+      create: {
+        userId: session.user.id,
+        businessName,
+        businessType,
+        registrationNumber: registrationNumber || null,
+        taxId: taxId || null,
+        contactPhone,
+        address,
+        city,
+        description: description || null,
+        status: "PENDING",
+        isVerified: false,
+        documents: documentsToCreate.length > 0 ? { create: documentsToCreate } : undefined,
+      },
+      update: {
+        businessName,
+        businessType,
+        registrationNumber: registrationNumber || null,
+        taxId: taxId || null,
+        contactPhone,
+        address,
+        city,
+        description: description || null,
+        status: "PENDING",
+        isVerified: false,
+        documents: documentsToCreate.length > 0 ? { create: documentsToCreate } : undefined,
+      },
+      include: {
+        documents: {
+          orderBy: {
+            uploadedAt: "desc",
+          },
         },
       },
-    },
-  });
+    });
 
-  return NextResponse.json({
-    message: "Owner onboarding submitted successfully.",
-    profile: ownerProfile,
-  });
+    return NextResponse.json({
+      message: "Owner onboarding submitted successfully.",
+      profile: ownerProfile,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: `Onboarding failed: ${error.message}` },
+      { status: 500 },
+    );
+  }
 }
