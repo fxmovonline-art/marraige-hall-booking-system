@@ -67,84 +67,87 @@ export default function AddHallPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center bg-gradient-to-b from-[#071a11] to-[#04110a] px-4 py-12">
+    <div className="min-h-screen flex items-start justify-center bg-gradient-to-b from-[#071a11] to-[#04110a] px-4 py-6 md:py-12">
       <OrganicShapeMask className="absolute inset-0 -z-10 opacity-20" />
-      <div className="z-10 w-full max-w-3xl rounded-2xl bg-white/95 p-8 shadow-xl">
-        <h2 className="text-2xl font-semibold text-zinc-900 mb-4">Add a new hall</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="z-10 w-full max-w-3xl rounded-lg md:rounded-2xl bg-white/95 p-4 md:p-8 shadow-xl">
+        <h2 className="text-xl md:text-2xl font-semibold text-zinc-900 mb-6">Add a new hall</h2>
+        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
           <label className="block">
-            <span className="text-sm font-medium text-zinc-700">Hall name</span>
-            <input className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" placeholder="Grand Orchid Events" value={name} onChange={(e)=>setName(e.target.value)} required />
+            <span className="text-xs md:text-sm font-medium text-zinc-700">Hall name</span>
+            <input className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="Grand Orchid Events" value={name} onChange={(e)=>setName(e.target.value)} required />
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-zinc-700">Short description</span>
-            <textarea className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" placeholder="A brief description for customers." value={description} onChange={(e)=>setDescription(e.target.value)} />
+            <span className="text-xs md:text-sm font-medium text-zinc-700">Short description</span>
+            <textarea className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none" rows={3} placeholder="A brief description for customers." value={description} onChange={(e)=>setDescription(e.target.value)} />
           </label>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
             <label>
-              <span className="text-sm font-medium text-zinc-700">Address</span>
-              <input className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" placeholder="123 Main Boulevard" value={address} onChange={(e)=>setAddress(e.target.value)} required />
+              <span className="text-xs md:text-sm font-medium text-zinc-700">Address</span>
+              <input className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="123 Main Boulevard" value={address} onChange={(e)=>setAddress(e.target.value)} required />
             </label>
 
             <label>
-              <span className="text-sm font-medium text-zinc-700">City</span>
-              <input className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" placeholder="Lahore" value={city} onChange={(e)=>setCity(e.target.value)} required />
+              <span className="text-xs md:text-sm font-medium text-zinc-700">City</span>
+              <input className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="Lahore" value={city} onChange={(e)=>setCity(e.target.value)} required />
             </label>
 
             <label>
-              <span className="text-sm font-medium text-zinc-700">Area / Neighborhood</span>
-              <input className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" placeholder="Johar Town" value={area} onChange={(e)=>setArea(e.target.value)} />
+              <span className="text-xs md:text-sm font-medium text-zinc-700">Area / Neighborhood</span>
+              <input className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="Johar Town" value={area} onChange={(e)=>setArea(e.target.value)} />
             </label>
 
             <label>
-              <span className="text-sm font-medium text-zinc-700">Contact phone</span>
-              <input className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" placeholder="+92 300 0000000" value={contactPhone} onChange={(e)=>setContactPhone(e.target.value)} />
+              <span className="text-xs md:text-sm font-medium text-zinc-700">Contact phone</span>
+              <input className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" placeholder="+92 300 0000000" value={contactPhone} onChange={(e)=>setContactPhone(e.target.value)} />
             </label>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             <label>
-              <span className="text-sm font-medium text-zinc-700">Capacity (guests)</span>
-              <input type="number" min={1} className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" value={capacity} onChange={(e)=>setCapacity(Number(e.target.value))} required />
+              <span className="text-xs md:text-sm font-medium text-zinc-700">Capacity (guests)</span>
+              <input type="number" min={1} className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" value={capacity} onChange={(e)=>setCapacity(Number(e.target.value))} required />
             </label>
 
             <label>
-              <span className="text-sm font-medium text-zinc-700">Price per head (PKR)</span>
-              <input type="number" min={0} className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" value={pricePerHead} onChange={(e)=>setPricePerHead(Number(e.target.value))} />
+              <span className="text-xs md:text-sm font-medium text-zinc-700">Price per head (PKR)</span>
+              <input type="number" min={0} className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" value={pricePerHead} onChange={(e)=>setPricePerHead(Number(e.target.value))} />
             </label>
 
             <label>
-              <span className="text-sm font-medium text-zinc-700">Price per day (PKR)</span>
-              <input type="number" min={0} className="mt-1 w-full rounded-md border px-3 py-2 text-zinc-900" value={pricePerDay} onChange={(e)=>setPricePerDay(Number(e.target.value))} />
+              <span className="text-xs md:text-sm font-medium text-zinc-700">Price per day (PKR)</span>
+              <input type="number" min={0} className="mt-2 w-full rounded-md border border-zinc-300 px-3 md:px-4 py-2 md:py-3 text-base text-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent" value={pricePerDay} onChange={(e)=>setPricePerDay(Number(e.target.value))} />
             </label>
           </div>
 
-          <div className="flex gap-4 items-center">
-            <label className="inline-flex items-center gap-2">
-              <input type="checkbox" checked={hasParking} onChange={(e)=>setHasParking(e.target.checked)} className="rounded" />
-              <span className="text-sm text-zinc-700">Parking</span>
-            </label>
-            <label className="inline-flex items-center gap-2">
-              <input type="checkbox" checked={hasAC} onChange={(e)=>setHasAC(e.target.checked)} className="rounded" />
-              <span className="text-sm text-zinc-700">Air conditioning</span>
-            </label>
-            <label className="inline-flex items-center gap-2">
-              <input type="checkbox" checked={hasCatering} onChange={(e)=>setHasCatering(e.target.checked)} className="rounded" />
-              <span className="text-sm text-zinc-700">On-site catering available</span>
-            </label>
+          <div className="space-y-3">
+            <p className="text-xs md:text-sm font-medium text-zinc-700">Amenities</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="inline-flex items-center gap-3 p-3 rounded-md border border-zinc-200 hover:bg-zinc-50 cursor-pointer transition-colors">
+                <input type="checkbox" checked={hasParking} onChange={(e)=>setHasParking(e.target.checked)} className="rounded w-4 h-4 cursor-pointer" />
+                <span className="text-sm text-zinc-700 font-medium">Parking</span>
+              </label>
+              <label className="inline-flex items-center gap-3 p-3 rounded-md border border-zinc-200 hover:bg-zinc-50 cursor-pointer transition-colors">
+                <input type="checkbox" checked={hasAC} onChange={(e)=>setHasAC(e.target.checked)} className="rounded w-4 h-4 cursor-pointer" />
+                <span className="text-sm text-zinc-700 font-medium">Air conditioning</span>
+              </label>
+              <label className="inline-flex items-center gap-3 p-3 rounded-md border border-zinc-200 hover:bg-zinc-50 cursor-pointer transition-colors">
+                <input type="checkbox" checked={hasCatering} onChange={(e)=>setHasCatering(e.target.checked)} className="rounded w-4 h-4 cursor-pointer" />
+                <span className="text-sm text-zinc-700 font-medium">On-site catering available</span>
+              </label>
+            </div>
           </div>
 
           <div>
             <label className="block">
-              <span className="text-sm font-medium text-zinc-700">Photos (upload multiple)</span>
-              <input type="file" multiple accept="image/*" onChange={(e)=>handleFiles(e.target.files)} className="mt-2" />
+              <span className="text-xs md:text-sm font-medium text-zinc-700 block mb-2">Photos (upload multiple)</span>
+              <input type="file" multiple accept="image/*" onChange={(e)=>handleFiles(e.target.files)} className="w-full px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-zinc-700 border border-zinc-300 rounded-md cursor-pointer" />
             </label>
             {images.length > 0 ? (
-              <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {images.map((file, idx) => (
-                  <div key={idx} className="h-24 w-full overflow-hidden rounded shadow-sm">
+                  <div key={idx} className="h-24 w-full overflow-hidden rounded-md shadow-sm border border-zinc-200">
                     <img src={URL.createObjectURL(file)} alt={file.name} className="h-full w-full object-cover" />
                   </div>
                 ))}
@@ -152,13 +155,13 @@ export default function AddHallPage() {
             ) : null}
           </div>
 
-          {error ? <div className="text-sm text-rose-600">{error}</div> : null}
+          {error ? <div className="text-xs md:text-sm text-rose-600 bg-rose-50 p-3 rounded-md border border-rose-200">{error}</div> : null}
 
-          <div className="flex gap-3">
-            <button type="submit" disabled={loading} className="rounded-md bg-emerald-600 px-4 py-2 text-white">
+          <div className="flex gap-3 pt-2">
+            <button type="submit" disabled={loading} className="flex-1 md:flex-none rounded-md bg-emerald-600 px-6 py-3 text-sm md:text-base font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors disabled:opacity-50">
               {loading ? "Creating..." : "Create hall"}
             </button>
-            <a href="/dashboard/owner" className="rounded-md border px-4 py-2">Cancel</a>
+            <a href="/dashboard/owner" className="flex-1 md:flex-none rounded-md border border-zinc-300 px-6 py-3 text-sm md:text-base font-medium text-zinc-700 hover:bg-zinc-50 text-center transition-colors">Cancel</a>
           </div>
         </form>
       </div>
