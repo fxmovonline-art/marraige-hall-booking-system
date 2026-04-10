@@ -101,41 +101,86 @@ export default async function AdminDashboardPage() {
 
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f5f1e8_40%,#ffffff_100%)] px-4 py-8 md:px-10 md:py-12">
-      <div className="mx-auto max-w-7xl flex gap-6 md:gap-8 flex-col md:flex-row">
-        <DashboardSidebarWrapper name={session.user.name ?? "Admin"} email={session.user.email ?? ""} role={session.user.role ?? "ADMIN"} />
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f5f1e8_40%,#ffffff_100%)]">
+      {/* Mobile-optimized container */}
+      <div className="px-4 py-6 md:px-10 md:py-12 pb-20 md:pb-12">
+        <div className="mx-auto max-w-7xl">
+          {/* Desktop layout with sidebar */}
+          <div className="hidden md:flex gap-8">
+            <DashboardSidebarWrapper name={session.user.name ?? "Admin"} email={session.user.email ?? ""} role={session.user.role ?? "ADMIN"} />
 
-        <div className="flex-1 min-w-0">
-          <div className="mb-8 md:mb-10 grid gap-4 md:gap-6 rounded-2xl md:rounded-[2rem] border border-black/10 bg-white/85 p-4 md:p-8 shadow-sm backdrop-blur md:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-rose-700">Admin control center</p>
-            <h1 className="mt-2 md:mt-3 text-2xl md:text-4xl font-semibold tracking-tight text-zinc-950">Pending moderation queue</h1>
-            <p className="mt-3 md:mt-4 max-w-2xl text-sm md:text-base leading-7 md:leading-8 text-zinc-600">
-              Review owner applications and hall listings in one place. Approval marks records as verified, while rejection keeps verification disabled.
-            </p>
-          </div>
-          <div className="rounded-xl md:rounded-[1.75rem] bg-zinc-950 p-4 md:p-6 text-white">
-            <div className="text-xs md:text-sm uppercase tracking-[0.24em] text-white/60">Queue summary</div>
-            <div className="mt-3 md:mt-4 space-y-2 md:space-y-3 text-xs md:text-sm text-white/80">
-              <div>{hallRows.length} hall listings awaiting decision</div>
-              <div>{ownerApplicationRows.length} owner applications awaiting decision</div>
+            <div className="flex-1 min-w-0 space-y-8">
+              <div className="grid gap-6 rounded-2xl md:rounded-[2rem] border border-black/10 bg-white/85 p-6 md:p-8 shadow-sm md:grid-cols-[1.2fr_0.8fr]">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-rose-700">Admin control center</p>
+                  <h1 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight text-zinc-950">Pending moderation queue</h1>
+                  <p className="mt-4 max-w-2xl text-sm md:text-base leading-7 md:leading-8 text-zinc-600">
+                    Review owner applications and hall listings in one place. Approval marks records as verified, while rejection keeps verification disabled.
+                  </p>
+                </div>
+                <div className="rounded-xl md:rounded-[1.75rem] bg-zinc-950 p-6 text-white">
+                  <div className="text-sm uppercase tracking-[0.24em] text-white/60">Queue summary</div>
+                  <div className="mt-4 space-y-3 text-sm text-white/80">
+                    <div>{hallRows.length} hall listings awaiting decision</div>
+                    <div>{ownerApplicationRows.length} owner applications awaiting decision</div>
+                  </div>
+                </div>
+              </div>
+
+              <AdminControlCenter
+                initialPendingHalls={hallRows}
+                initialPendingOwnerApplications={ownerApplicationRows}
+                initialComplaints={complaints.map((c) => ({
+                  id: c.id,
+                  subject: c.subject,
+                  message: c.message,
+                  status: c.status,
+                  customerName: c.customer.name,
+                  customerEmail: c.customer.email,
+                  createdAt: c.createdAt.toISOString(),
+                }))}
+              />
             </div>
           </div>
-        </div>
 
-          <AdminControlCenter
-            initialPendingHalls={hallRows}
-            initialPendingOwnerApplications={ownerApplicationRows}
-            initialComplaints={complaints.map((c) => ({
-              id: c.id,
-              subject: c.subject,
-              message: c.message,
-              status: c.status,
-              customerName: c.customer.name,
-              customerEmail: c.customer.email,
-              createdAt: c.createdAt.toISOString(),
-            }))}
-          />
+          {/* Mobile layout - full width */}
+          <div className="md:hidden flex flex-col gap-6">
+            <DashboardSidebarWrapper name={session.user.name ?? "Admin"} email={session.user.email ?? ""} role={session.user.role ?? "ADMIN"} />
+
+            <div className="space-y-6">
+              <div className="rounded-xl border border-black/10 bg-white/90 p-4 shadow-sm">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-rose-700">Admin control center</p>
+                  <h1 className="mt-2 text-xl font-semibold tracking-tight text-zinc-950">Pending moderation queue</h1>
+                  <p className="mt-3 text-xs leading-5 text-zinc-600">
+                    Review owner applications and hall listings. Approve or reject to verify records.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-zinc-950 p-4 text-white">
+                <div className="text-xs uppercase tracking-[0.2em] text-white/60">Queue summary</div>
+                <div className="mt-3 space-y-2 text-xs text-white/80">
+                  <div>• {hallRows.length} hall listings pending</div>
+                  <div>• {ownerApplicationRows.length} owner applications pending</div>
+                </div>
+              </div>
+
+              <AdminControlCenter
+                initialPendingHalls={hallRows}
+                initialPendingOwnerApplications={ownerApplicationRows}
+                initialComplaints={complaints.map((c) => ({
+                  id: c.id,
+                  subject: c.subject,
+                  message: c.message,
+                  status: c.status,
+                  customerName: c.customer.name,
+                  customerEmail: c.customer.email,
+                  createdAt: c.createdAt.toISOString(),
+                }))}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </main>

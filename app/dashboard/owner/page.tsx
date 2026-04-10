@@ -131,52 +131,104 @@ export default async function OwnerDashboardPage() {
   const revenue = successfulRevenue._sum.amount ? Number(successfulRevenue._sum.amount.toString()) : 0;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f4efe5_38%,#ffffff_100%)] px-4 py-8 md:px-10 md:py-12">
-      <div className="mx-auto max-w-7xl flex gap-6 md:gap-8 flex-col md:flex-row">
-        <DashboardSidebarWrapper name={session.user.name ?? "Owner"} email={session.user.email ?? ""} role={session.user.role ?? "OWNER"} ownerHalls={ownerHalls} />
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f4efe5_38%,#ffffff_100%)]">
+      <div className="px-4 py-6 md:px-10 md:py-12 pb-20 md:pb-12">
+        <div className="mx-auto max-w-7xl">
+          {/* Desktop layout */}
+          <div className="hidden md:flex gap-8">
+            <DashboardSidebarWrapper name={session.user.name ?? "Owner"} email={session.user.email ?? ""} role={session.user.role ?? "OWNER"} ownerHalls={ownerHalls} />
 
-        <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
-        <section className="grid gap-4 md:gap-6 rounded-2xl md:rounded-4xl border border-black/10 bg-white/85 p-4 md:p-8 shadow-sm md:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">Owner Dashboard</p>
-            <h1 className="mt-2 md:mt-3 text-2xl md:text-4xl font-semibold tracking-tight text-zinc-950">Hall Operations Overview</h1>
-            <p className="mt-3 md:mt-4 max-w-2xl text-sm md:text-base leading-7 md:leading-8 text-zinc-600">
-              Review inquiries, update booking statuses, and monitor confirmed reservations in one place.
-            </p>
+            <div className="flex-1 min-w-0 space-y-8">
+              <section className="grid gap-6 rounded-4xl border border-black/10 bg-white/85 p-8 shadow-sm md:grid-cols-[1.2fr_0.8fr]">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">Owner Dashboard</p>
+                  <h1 className="mt-3 text-4xl font-semibold tracking-tight text-zinc-950">Hall Operations Overview</h1>
+                  <p className="mt-4 max-w-2xl text-base leading-8 text-zinc-600">
+                    Review inquiries, update booking statuses, and monitor confirmed reservations in one place.
+                  </p>
+                </div>
+                <div className="rounded-[1.75rem] bg-zinc-950 p-6 text-white">
+                  <div className="text-sm uppercase tracking-[0.24em] text-white/65">Owner Profile</div>
+                  <div className="mt-3 text-2xl font-semibold">{ownerProfile?.businessName ?? "Not submitted yet"}</div>
+                  <div className="mt-2 text-sm text-white/80">Status: {ownerProfile?.status ?? "PENDING"}</div>
+                </div>
+              </section>
+
+              <div className="flex flex-wrap items-center gap-3">
+                {ownerProfile?.businessName ? null : (
+                  <a
+                    href="/dashboard/owner/onboarding"
+                    className="rounded-full bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-500"
+                  >
+                    Complete owner profile
+                  </a>
+                )}
+                <a
+                  href="/dashboard/owner/halls/new"
+                  className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-100"
+                >
+                  Add a hall
+                </a>
+              </div>
+
+              <OwnerDashboardPanel
+                stats={{
+                  totalBookings,
+                  revenue,
+                  pendingRequests,
+                }}
+                bookings={bookingRows}
+                confirmedBookings={confirmedBookingRows}
+              />
+            </div>
           </div>
-          <div className="rounded-xl md:rounded-[1.75rem] bg-zinc-950 p-4 md:p-6 text-white">
-            <div className="text-xs md:text-sm uppercase tracking-[0.24em] text-white/65">Owner Profile</div>
-            <div className="mt-2 md:mt-3 text-lg md:text-2xl font-semibold">{ownerProfile?.businessName ?? "Not submitted yet"}</div>
-            <div className="mt-1 md:mt-2 text-xs md:text-sm text-white/80">Status: {ownerProfile?.status ?? "PENDING"}</div>
+
+          {/* Mobile layout - full width */}
+          <div className="md:hidden flex flex-col gap-6">
+            <DashboardSidebarWrapper name={session.user.name ?? "Owner"} email={session.user.email ?? ""} role={session.user.role ?? "OWNER"} ownerHalls={ownerHalls} />
+
+            <section className="rounded-xl border border-black/10 bg-white/90 p-4 shadow-sm space-y-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">Owner Dashboard</p>
+                <h1 className="mt-2 text-xl font-semibold tracking-tight text-zinc-950">Hall Operations</h1>
+                <p className="mt-2 text-xs leading-5 text-zinc-600">
+                  Manage bookings and reservations.
+                </p>
+              </div>
+              <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
+                <div className="text-xs uppercase tracking-[0.24em] text-amber-700 font-semibold">Your Profile</div>
+                <div className="mt-2 text-base font-semibold text-zinc-950">{ownerProfile?.businessName ?? "Not submitted"}</div>
+                <div className="mt-1 text-xs text-zinc-700">Status: {ownerProfile?.status ?? "PENDING"}</div>
+              </div>
+            </section>
+
+            <div className="flex flex-col gap-2">
+              {ownerProfile?.businessName ? null : (
+                <a
+                  href="/dashboard/owner/onboarding"
+                  className="rounded-lg bg-amber-600 px-4 py-3 text-sm font-medium text-white hover:bg-amber-500 text-center transition-colors"
+                >
+                  Complete owner profile
+                </a>
+              )}
+              <a
+                href="/dashboard/owner/halls/new"
+                className="rounded-lg border border-black/10 px-4 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-100 text-center transition-colors"
+              >
+                Add a hall
+              </a>
+            </div>
+
+            <OwnerDashboardPanel
+              stats={{
+                totalBookings,
+                revenue,
+                pendingRequests,
+              }}
+              bookings={bookingRows}
+              confirmedBookings={confirmedBookingRows}
+            />
           </div>
-        </section>
-
-        <div className="flex items-center gap-3">
-          {ownerProfile?.businessName ? null : (
-            <a
-              href="/dashboard/owner/onboarding"
-              className="rounded-full bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-500"
-            >
-              Complete owner profile
-            </a>
-          )}
-          <a
-            href="/dashboard/owner/halls/new"
-            className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-100"
-          >
-            Add a hall
-          </a>
-        </div>
-
-          <OwnerDashboardPanel
-          stats={{
-            totalBookings,
-            revenue,
-            pendingRequests,
-          }}
-          bookings={bookingRows}
-          confirmedBookings={confirmedBookingRows}
-        />
         </div>
       </div>
     </main>
