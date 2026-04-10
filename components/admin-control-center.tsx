@@ -296,8 +296,6 @@ export function AdminControlCenter({
                       {application.contactPhone}
                     </td>
                     <td className="hidden md:table-cell px-2 md:px-4 py-3 md:py-4">
-                      <div className="space-y-1"
-                      <td className="hidden md:table-cell px-2 md:px-4 py-3 md:py-4">
                       <div className="space-y-1">
                         <div className="text-xs md:text-sm text-zinc-700">
                           {application.documentCount} linked
