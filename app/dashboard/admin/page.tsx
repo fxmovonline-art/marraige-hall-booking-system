@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "@/auth";
 import { AdminControlCenter } from "@/components/admin-control-center";
-import DashboardSidebar from "@/components/dashboard-sidebar";
+import DashboardSidebarWrapper from "@/components/dashboard-sidebar-wrapper";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboardPage() {
@@ -103,9 +103,7 @@ export default async function AdminDashboardPage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f5f1e8_40%,#ffffff_100%)] px-4 py-8 md:px-10 md:py-12">
       <div className="mx-auto max-w-7xl flex gap-6 md:gap-8 flex-col md:flex-row">
-        <div className="hidden md:block">
-          <DashboardSidebar name={session.user.name ?? "Admin"} email={session.user.email ?? ""} role={session.user.role ?? "ADMIN"} />
-        </div>
+        <DashboardSidebarWrapper name={session.user.name ?? "Admin"} email={session.user.email ?? ""} role={session.user.role ?? "ADMIN"} />
 
         <div className="flex-1 min-w-0">
           <div className="mb-8 md:mb-10 grid gap-4 md:gap-6 rounded-2xl md:rounded-[2rem] border border-black/10 bg-white/85 p-4 md:p-8 shadow-sm backdrop-blur md:grid-cols-[1.2fr_0.8fr]">

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/auth";
 import { OwnerDashboardPanel } from "@/components/owner-dashboard-panel";
 import { prisma } from "@/lib/prisma";
-import DashboardSidebar from "@/components/dashboard-sidebar";
+import DashboardSidebarWrapper from "@/components/dashboard-sidebar-wrapper";
 
 export default async function OwnerDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -131,23 +131,23 @@ export default async function OwnerDashboardPage() {
   const revenue = successfulRevenue._sum.amount ? Number(successfulRevenue._sum.amount.toString()) : 0;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f4efe5_38%,#ffffff_100%)] px-6 py-12 md:px-10">
-      <div className="mx-auto max-w-7xl flex gap-8">
-        <DashboardSidebar name={session.user.name ?? "Owner"} email={session.user.email ?? ""} role={session.user.role ?? "OWNER"} ownerHalls={ownerHalls} />
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fff8e7_0%,#f4efe5_38%,#ffffff_100%)] px-4 py-8 md:px-10 md:py-12">
+      <div className="mx-auto max-w-7xl flex gap-6 md:gap-8 flex-col md:flex-row">
+        <DashboardSidebarWrapper name={session.user.name ?? "Owner"} email={session.user.email ?? ""} role={session.user.role ?? "OWNER"} ownerHalls={ownerHalls} />
 
-        <div className="flex-1 space-y-8">
-        <section className="grid gap-6 rounded-4xl border border-black/10 bg-white/85 p-8 shadow-sm md:grid-cols-[1.2fr_0.8fr]">
+        <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
+        <section className="grid gap-4 md:gap-6 rounded-2xl md:rounded-4xl border border-black/10 bg-white/85 p-4 md:p-8 shadow-sm md:grid-cols-[1.2fr_0.8fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">Owner Dashboard</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-zinc-950">Hall Operations Overview</h1>
-            <p className="mt-4 max-w-2xl text-base leading-8 text-zinc-600">
+            <h1 className="mt-2 md:mt-3 text-2xl md:text-4xl font-semibold tracking-tight text-zinc-950">Hall Operations Overview</h1>
+            <p className="mt-3 md:mt-4 max-w-2xl text-sm md:text-base leading-7 md:leading-8 text-zinc-600">
               Review inquiries, update booking statuses, and monitor confirmed reservations in one place.
             </p>
           </div>
-          <div className="rounded-[1.75rem] bg-zinc-950 p-6 text-white">
-            <div className="text-sm uppercase tracking-[0.24em] text-white/65">Owner Profile</div>
-            <div className="mt-3 text-2xl font-semibold">{ownerProfile?.businessName ?? "Not submitted yet"}</div>
-            <div className="mt-2 text-sm text-white/80">Status: {ownerProfile?.status ?? "PENDING"}</div>
+          <div className="rounded-xl md:rounded-[1.75rem] bg-zinc-950 p-4 md:p-6 text-white">
+            <div className="text-xs md:text-sm uppercase tracking-[0.24em] text-white/65">Owner Profile</div>
+            <div className="mt-2 md:mt-3 text-lg md:text-2xl font-semibold">{ownerProfile?.businessName ?? "Not submitted yet"}</div>
+            <div className="mt-1 md:mt-2 text-xs md:text-sm text-white/80">Status: {ownerProfile?.status ?? "PENDING"}</div>
           </div>
         </section>
 
