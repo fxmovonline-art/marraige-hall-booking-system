@@ -14,8 +14,31 @@ type Complaint = {
   createdAt: string;
 };
 
+type UserBooking = {
+  id: string;
+  hallId: string;
+  hallName: string;
+  hallAddress: string;
+  hallCity: string;
+  hallImage: string | null;
+  eventDate: string;
+  eventDateFull: string;
+  slot: string;
+  guestCount: number;
+  totalPrice: string;
+  status: string;
+  createdAt: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  packageName: string;
+  specialNotes: string | null;
+};
+
 export default function UserDashboard() {
   const { data: session } = useSession();
+  const [bookings, setBookings] = useState<UserBooking[]>([]);
+  const [isLoadingBookings, setIsLoadingBookings] = useState(true);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoadingComplaints, setIsLoadingComplaints] = useState(true);
   const [showComplaintForm, setShowComplaintForm] = useState(false);
@@ -23,9 +46,25 @@ export default function UserDashboard() {
 
   useEffect(() => {
     if (session) {
+      fetchBookings();
       fetchComplaints();
     }
   }, [session]);
+
+  async function fetchBookings() {
+    setIsLoadingBookings(true);
+    try {
+      const response = await fetch("/api/user/bookings");
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setBookings(data);
+      }
+    } catch (error) {
+      console.error("Fetch bookings error:", error);
+    } finally {
+      setIsLoadingBookings(false);
+    }
+  }
 
   async function fetchComplaints() {
     setIsLoadingComplaints(true);
@@ -76,10 +115,91 @@ export default function UserDashboard() {
             <span className="h-2 w-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
             <span>Your Hall Bookings</span>
           </h2>
-          {/* TODO: List user's bookings here */}
-          <div className="flex flex-col items-center justify-center py-8 md:py-10 opacity-60">
-             <div className="text-sm md:text-base text-zinc-500">No bookings found.</div>
-          </div>
+          
+          {isLoadingBookings ? (
+            <div className="text-center py-6 text-zinc-500 text-xs md:text-sm">Fetching your bookings...</div>
+          ) : bookings.length > 0 ? (
+            <div className="space-y-4 md:space-y-6">
+              {bookings.map((booking) => (
+                <div key={booking.id} className="rounded-xl border border-black/5 bg-white/50 overflow-hidden hover:bg-white/70 transition-colors">
+                  <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6">
+                    {/* Hall Image */}
+                    {booking.hallImage && (
+                      <div className="w-full md:w-48 h-40 md:h-40 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-200">
+                        {/* Using img instead of Next Image to avoid setup issues */}
+                        <img 
+                          src={booking.hallImage} 
+                          alt={booking.hallName}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Booking Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Hall Name</p>
+                          <p className="text-sm md:text-base font-bold text-zinc-900 truncate">{booking.hallName}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Location</p>
+                          <p className="text-sm md:text-base font-medium text-zinc-700">{booking.hallAddress}, {booking.hallCity}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Event Date</p>
+                          <p className="text-sm md:text-base font-medium text-zinc-700">{new Date(booking.eventDate).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" })}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Slot</p>
+                          <p className="text-sm md:text-base font-medium text-zinc-700">{booking.slot}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Guests</p>
+                          <p className="text-sm md:text-base font-medium text-zinc-700">{booking.guestCount} people</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total Price</p>
+                          <p className="text-sm md:text-base font-bold text-emerald-600">PKR {Number(booking.totalPrice).toLocaleString("en-PK")}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Status</p>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ${
+                            booking.status === "PENDING_CONFIRMATION" ? "bg-amber-100 text-amber-700" :
+                            booking.status === "CONFIRMED" ? "bg-emerald-100 text-emerald-700" :
+                            booking.status === "REJECTED" ? "bg-rose-100 text-rose-700" :
+                            booking.status === "ADVANCE_PAID" ? "bg-blue-100 text-blue-700" :
+                            "bg-zinc-100 text-zinc-700"
+                          }`}>
+                            {booking.status.replaceAll("_", " ")}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {booking.specialNotes && (
+                        <div className="mt-4 pt-4 border-t border-black/5">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-1">Special Notes</p>
+                          <p className="text-sm text-zinc-600">{booking.specialNotes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Footer with Contact Info */}
+                  <div className="border-t border-black/5 bg-zinc-50/50 px-4 md:px-6 py-3 md:py-4">
+                    <p className="text-xs text-zinc-600">
+                      <span className="font-semibold">{booking.contactName}</span> • {booking.contactEmail} • {booking.contactPhone}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 md:py-16 opacity-60">
+              <div className="text-sm md:text-base text-zinc-500">No bookings found.</div>
+              <p className="text-xs md:text-sm text-zinc-400 mt-2">Start by exploring halls and making your first booking!</p>
+            </div>
+          )}
         </section>
 
         {/* Two Column Section - Chat and Complaint */}

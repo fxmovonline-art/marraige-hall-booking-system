@@ -113,7 +113,7 @@ export async function POST(request: Request) {
           hallId,
           eventDate,
           slot,
-          status: "ADVANCE_PAID",
+          status: "PENDING_CONFIRMATION",
           startTime,
           endTime,
           guestCount,
