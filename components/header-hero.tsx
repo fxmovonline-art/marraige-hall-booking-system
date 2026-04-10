@@ -91,17 +91,35 @@ export default function HeaderHero() {
             <span className="absolute bottom-0 left-0 h-px w-0 bg-yellow-400 transition-all duration-500 group-hover:w-full"></span>
           </Link>
         </div>
-        {/* Mobile menu panel */}
-        {mobileOpen && (
-          <div className="md:hidden absolute left-0 right-0 top-full z-40 bg-[linear-gradient(135deg,#054e2b_0%,#066e4a_45%,#053c2a_100%)]/95">
-            <div className="flex flex-col px-4 py-4 gap-3">
-              <Link href="/halls" className="text-yellow-200 font-medium py-2">Halls</Link>
-              <Link href={dashboardHref} className="text-yellow-200 font-medium py-2">{dashboardLabel}</Link>
-              <Link href="/#contact" className="text-yellow-200 font-medium py-2">Contacts</Link>
-            </div>
-          </div>
-        )}
       </nav>
+      {/* Mobile menu panel */}
+      {mobileOpen && (
+        <div className="md:hidden w-full bg-[linear-gradient(135deg,#054e2b_0%,#066e4a_45%,#053c2a_100%)]/95 border-t border-yellow-400/20">
+          <div className="flex flex-col px-4 py-4 gap-3 max-w-7xl mx-auto">
+            <Link 
+              href="/halls" 
+              className="text-yellow-200 font-medium py-2 px-2 rounded hover:bg-yellow-400/10 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              Halls
+            </Link>
+            <Link 
+              href={dashboardHref} 
+              className="text-yellow-200 font-medium py-2 px-2 rounded hover:bg-yellow-400/10 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {dashboardLabel}
+            </Link>
+            <Link 
+              href="/#contact" 
+              className="text-yellow-200 font-medium py-2 px-2 rounded hover:bg-yellow-400/10 transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              Contacts
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
